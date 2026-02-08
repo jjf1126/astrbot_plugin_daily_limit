@@ -2078,11 +2078,15 @@ class DailyLimitPlugin(star.Star):
             block_message = self._format_block_notification(user_name, abuse_result, block_info)
             
             if event.get_message_type() == MessageType.GROUP_MESSAGE:
-                await event.send(
-                    MessageChain().at(user_name, user_id).message(block_message)
-                )
+                #await event.send(
+                #    MessageChain().at(user_name, user_id).message(block_message)
+                #)
+                self._log_info("用户 {} 跳过通知", user_id_str)
+                event.stop_event()
             else:
-                await event.send(MessageChain().message(block_message))
+                #await event.send(MessageChain().message(block_message))
+                self._log_info("跳过通知")
+                event.stop_event()
             
             # 记录通知时间
             self.notified_users[user_id_str] = current_time
@@ -2167,15 +2171,19 @@ class DailyLimitPlugin(star.Star):
                 usage, limit, user_name, group_name, group_mode
             )
             
-            await event.send(
-                MessageChain().at(user_name, user_id).message(custom_message)
-            )
+          #  await event.send(
+        #        MessageChain().at(user_name, user_id).message(custom_message)
+        #    )
+            self._log_info("跳过通知")
+            event.stop_event()
         else:
             user_name = event.get_sender_name()
             custom_message = self._get_custom_zero_usage_message(
                 usage, limit, user_name, None, None
             )
-            await event.send(MessageChain().message(custom_message))
+            #await event.send(MessageChain().message(custom_message))
+            self._log_info("跳过通知")
+            event.stop_event()
         
         # 记录提醒时间
         if cooldown_enabled:
